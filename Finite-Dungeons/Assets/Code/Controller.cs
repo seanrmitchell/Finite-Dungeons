@@ -94,6 +94,34 @@ public partial class @Controller : IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": true
                 }
             ]
+        },
+        {
+            ""name"": ""Attack"",
+            ""id"": ""45c56843-886a-4321-990b-38489eab247b"",
+            ""actions"": [
+                {
+                    ""name"": ""Fire"",
+                    ""type"": ""Button"",
+                    ""id"": ""9edbd97c-8de8-490a-bae4-85e1167c291a"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""5ffa1fa1-d1a3-4fff-b5c3-d47d4c956b63"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Fire"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": []
@@ -101,6 +129,9 @@ public partial class @Controller : IInputActionCollection2, IDisposable
         // Movement
         m_Movement = asset.FindActionMap("Movement", throwIfNotFound: true);
         m_Movement_Strafe = m_Movement.FindAction("Strafe", throwIfNotFound: true);
+        // Attack
+        m_Attack = asset.FindActionMap("Attack", throwIfNotFound: true);
+        m_Attack_Fire = m_Attack.FindAction("Fire", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -189,8 +220,45 @@ public partial class @Controller : IInputActionCollection2, IDisposable
         }
     }
     public MovementActions @Movement => new MovementActions(this);
+
+    // Attack
+    private readonly InputActionMap m_Attack;
+    private IAttackActions m_AttackActionsCallbackInterface;
+    private readonly InputAction m_Attack_Fire;
+    public struct AttackActions
+    {
+        private @Controller m_Wrapper;
+        public AttackActions(@Controller wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Fire => m_Wrapper.m_Attack_Fire;
+        public InputActionMap Get() { return m_Wrapper.m_Attack; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(AttackActions set) { return set.Get(); }
+        public void SetCallbacks(IAttackActions instance)
+        {
+            if (m_Wrapper.m_AttackActionsCallbackInterface != null)
+            {
+                @Fire.started -= m_Wrapper.m_AttackActionsCallbackInterface.OnFire;
+                @Fire.performed -= m_Wrapper.m_AttackActionsCallbackInterface.OnFire;
+                @Fire.canceled -= m_Wrapper.m_AttackActionsCallbackInterface.OnFire;
+            }
+            m_Wrapper.m_AttackActionsCallbackInterface = instance;
+            if (instance != null)
+            {
+                @Fire.started += instance.OnFire;
+                @Fire.performed += instance.OnFire;
+                @Fire.canceled += instance.OnFire;
+            }
+        }
+    }
+    public AttackActions @Attack => new AttackActions(this);
     public interface IMovementActions
     {
         void OnStrafe(InputAction.CallbackContext context);
+    }
+    public interface IAttackActions
+    {
+        void OnFire(InputAction.CallbackContext context);
     }
 }
