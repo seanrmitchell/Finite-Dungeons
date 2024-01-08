@@ -2,41 +2,48 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerAttack : MonoBehaviour
+public class RangedEnemy : MonoBehaviour
 {
+
     public Transform firePos;
     public GameObject shootPrefab;
-    public Controller playerShoot;
 
     [SerializeField]
-    private float rangedDamage, fireForce;
+    private float damage, fireForce;
 
-    private void Awake()
-    {
-        playerShoot = new Controller();
-    }
+    [SerializeField]
+    private float attackCoolDown;
 
-    private void OnEnable()
-    {
-        playerShoot.Enable();
-    }
-    private void OnDisable()
-    {
-        playerShoot.Disable();
-    }
+    private float attackSpeed;
 
     // Start is called before the first frame update
     void Start()
     {
-        playerShoot.Attack.Fire.performed += _ => Shoot();
+        attackSpeed = attackCoolDown;
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (attackSpeed >= attackCoolDown) {
+            Shoot();
+            attackSpeed = 0f;
+        }
+        
+
+        if (attackSpeed < attackCoolDown)
+        {
+            attackSpeed += Time.deltaTime;
+        }
     }
 
     void Shoot()
     {
         // Creates a clone using "missile" prefab, applies damage, and applies a force to propel
         GameObject laser = Instantiate(shootPrefab, firePos.position, firePos.rotation);
-        laser.GetComponent<Missile>().damage = rangedDamage;
         Rigidbody2D rb = laser.GetComponent<Rigidbody2D>();
+        laser.GetComponent<Missile>().damage = damage;
         rb.AddForce(firePos.up * fireForce, ForceMode2D.Impulse);
     }
 }
+

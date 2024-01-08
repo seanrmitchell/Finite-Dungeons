@@ -24,6 +24,7 @@ public class MeleeEnemy : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // Casts a circle at the enemies position
         Collider2D[] hitPlayer = Physics2D.OverlapCircleAll(transform.position, attackRange, playerLayer);
 
         foreach (Collider2D player in hitPlayer)
