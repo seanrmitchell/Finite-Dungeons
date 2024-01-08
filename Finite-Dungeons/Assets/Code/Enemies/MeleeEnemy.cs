@@ -22,16 +22,16 @@ public class MeleeEnemy : MonoBehaviour
     }
 
     // Update is called once per frame
-    void FixedUpdate()
+    void Update()
     {
-        Collider[] hitPlayer = Physics.OverlapSphere(transform.position, attackRange, playerLayer);
+        Collider2D[] hitPlayer = Physics2D.OverlapCircleAll(transform.position, attackRange, playerLayer);
 
-        foreach (Collider player in hitPlayer)
+        foreach (Collider2D player in hitPlayer)
         {
             if (attackSpeed >= attackCoolDown)
             {
-                Debug.Log("Player Hit!");
-                //player.gameObject.GetComponent<PlayerCondition>().UpdateHealth(damage);
+                Debug.Log("PlayerHit");
+                player.gameObject.GetComponent<Health>().UpdateHealth(damage);
                 attackSpeed = 0f;
             }
         }

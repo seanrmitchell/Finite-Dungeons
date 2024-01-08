@@ -14,14 +14,6 @@ public class EnemyMove : MonoBehaviour
         target = GameObject.Find("Player");
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.gameObject.tag == "Bullet")
-        {
-            Destroy(gameObject);
-        }
-    }
-
     void Update()
     {
         float distance = Vector3.Distance(target.transform.position, transform.position);
