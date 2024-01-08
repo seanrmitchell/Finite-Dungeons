@@ -8,11 +8,13 @@ public class PlayerMove : MonoBehaviour
     public Controller playerMove;
 
     [SerializeField]
-    private float speed;
+    private float speed, smoothMove;
 
-    private CharacterController player;
+    private Rigidbody2D player;
 
     private Vector2 move, mousePos;
+
+    private Vector2 baseVel = Vector2.zero;
 
     void Awake()
     {
@@ -32,11 +34,11 @@ public class PlayerMove : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        player = gameObject.GetComponent<CharacterController>();
+        player = gameObject.GetComponent<Rigidbody2D>();
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         // Reads in mouse position on screen translated to vector 2
         // Converts the position to a world point in engine
@@ -52,6 +54,6 @@ public class PlayerMove : MonoBehaviour
 
         // Calculates player vector2 movement from keys and applies to player
         move = playerMove.Movement.Strafe.ReadValue<Vector2>();
-        player.Move(move * Time.deltaTime * speed);
+        player.velocity = Vector2.SmoothDamp(player.velocity, move * speed, ref baseVel, smoothMove);
     }
 }
